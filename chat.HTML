@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI SIYA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="styles.css"></script>
+    <style>
+        /* Your existing CSS styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f7f8f8, #fcfbfc);
+        }
+
+        #chat-window {
+            background: linear-gradient(to bottom, #f6f6f7, #fcf9fc);
+            height: calc(100vh - 150px);
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #send-button {
+            background: linear-gradient(135deg, #000000, #fdfdfd);
+            color: rgb(250, 246, 246);
+            font-weight: bold;
+            border: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #send-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #1f2937;
+            box-shadow: 0 0 8px rgba(31, 41, 55, 0.5);
+        }
+
+        .message {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border-radius: 12px 12px 0 12px;
+        }
+
+        .message.ai {
+            background: linear-gradient(135deg, #c92b9c, #85269c);
+            color: white;
+            border-radius: 12px 12px 12px 0;
+        }
+
+        @keyframes gradientBackground {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        body {
+            background: linear-gradient(-45deg, #db5bb5, #0a0005, #8248b1, #192b66);
+            background-size: 400% 400%;
+            animation: gradientBackground 10s ease infinite;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #1f2937, #111827);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: -250px;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .sidebar button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        #sidebar-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: none;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 1001;
+            transition: transform 0.2s ease;
+        }
+
+        #sidebar-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg, #000000, #2d3436);
+            z-index: 1000;
+        }
+
+        .title-text {
+            font-size: 4rem;
+            background: linear-gradient(45deg, #ff6b6b, #cc5de8, #845ef7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: titleEntrance 1.5s ease-out forwards,
+                     subtitleGlow 2s infinite 2s;
+        }
+
+        @keyframes titleEntrance {
+            0% { 
+                opacity: 0;
+                transform: translateY(-50px) scale(0.5);
+            }
+            70% {
+                transform: translateY(10px) scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes subtitleGlow {
+            0% { text-shadow: 0 0 10px rgba(255,255,255,0); }
+            50% { text-shadow: 0 0 20px rgb(255, 255, 255); }
+            100% { text-shadow: 0 0 10px rgba(255,255,255,0); }
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+    <!-- Preloader -->
+    <div class="preloader">
+        <h1 class="title-text font-bold">AI SIYA</h1>
+    </div>
+
+    <!-- Sidebar Toggle Button -->
+    <button id="sidebar-toggle">☰</button>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>AI SIYA</h2>
+        <button id="new-chat-button">New Chat</button>
+        <button id="history-button">History</button> <!-- New History Button -->
+        <button id="get-app-button">Get App</button>
+        <button id="home-button">Home</button> <!-- Home Button with Unique ID -->
+    </div>
+
+    <!-- Overlay for closing sidebar -->
+    <div class="overlay"></div>
+
+    <!-- Main Chat Section -->
+    <main class="flex-grow flex flex-col items-center p-4">
+        <div class="flex flex-col w-full max-w-3xl h-full bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Chat Window -->
+            <div id="chat-window" class="flex-grow p-4 overflow-y-auto space-y-4">
+                <!-- Messages will be appended here -->
+            </div>
+
+            <!-- Input Section -->
+            <div class="p-4 flex items-center border-t border-gray-300 bg-gray-50">
+                <input id="user-input" type="text" class="flex-grow p-3 rounded-lg border border-white-300 text-gray-700 focus:ring focus:ring-black" placeholder="Type your message...">
+                <button id="send-button" class="ml-2 px-6 py-2 rounded-lg font-semibold shadow-md">➤</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript File Linked -->
+    <script src="./sha.js"></script>
+    <script src="./main.js"></script>
+
+    <script>
+        // Add preloader removal and initial message
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.querySelector('.preloader').remove();
+                document.querySelector('main').classList.remove('hidden');
+                
+                // Add initial AI message
+                const chatWindow = document.getElementById('chat-window');
+                const greeting = document.createElement('div');
+                greeting.className = 'message ai p-4 text-white max-w-[100%] self-start';
+                greeting.innerHTML = '✨ Welcome! I am SIYA, your AI companion. How may I assist you today?';
+                chatWindow.appendChild(greeting);
+            }, 3500); // Match animation duration
+        });
+
+        // Sidebar functionality
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const overlay = document.querySelector('.overlay');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Sidebar button functionality
+        document.getElementById('new-chat-button').addEventListener('click', () => {
+            const chatWindow = document.getElementById('chat-window');
+            chatWindow.innerHTML = ''; // Clear chat window
+            const greeting = document.createElement('div');
+            greeting.className = 'message ai p-4 text-white max-w-[100%] self-start';
+            greeting.innerHTML = '✨ Welcome! I am SIYA, your AI companion. How may I assist you today?';
+            chatWindow.appendChild(greeting);
+        });
+
+        // Open history.html when the History button is clicked
+        document.getElementById('history-button').addEventListener('click', () => {
+            window.open('history.html', '_blank'); // Open in a new tab
+        });
+
+        // Home button functionality to open aisya.html
+        document.getElementById('home-button').addEventListener('click', () => {
+            window.location.href = 'aisiya.html'; // Redirect to aisya.html
+        });
+    </script>
+</body>
+</html>
